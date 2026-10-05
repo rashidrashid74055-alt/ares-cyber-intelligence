@@ -32,61 +32,89 @@ export default {
         );
       }
 
-      const apiKey = process.env.OPENAI_API_KEY;
+      const apiKey = process.env.GEMINI_API_KEY;
 
       if (!apiKey) {
         return new Response(
-          JSON.stringify({ error: "OPENAI_API_KEY is not configured." }),
+          JSON.stringify({
+            error: "GEMINI_API_KEY is not configured."
+          }),
           { status: 500, headers: corsHeaders }
         );
       }
 
-      const response = await fetch("https://api.openai.com/v1/responses", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${apiKey}`
-        },
-        body: JSON.stringify({
-          model: "gpt-5",
-          input: [
-            {
-              role: "system",
-              content:
-                "You are ARES AI, a helpful general-purpose AI assistant. Answer clearly and accurately. For cybersecurity topics, focus on authorized testing, defensive security, learning, troubleshooting, and safe lab environments. Do not provide instructions that facilitate malware, credential theft, unauthorized access, evasion, destructive attacks, or other harmful activity."
+      const response = await fetch(
+        "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-goog-api-key": apiKey
+          },
+          body: JSON.stringify({
+            systemInstruction: {
+              parts: [
+                {
+                  text:
+                    "You are ARES AI, a helpful general-purpose AI assistant. Answer clearly, accurately and naturally. For cybersecurity topics, focus on authorized testing, defensive security, education, troubleshooting and safe lab environments. Do not provide instructions that facilitate malware, credential theft, unauthorized access, evasion, destructive attacks or other harmful activity."
+                }
+              ]
             },
-            {
-              role: "user",
-              content: message
-            }
-          ]
-        })
-      });
+            contents: [
+              {
+                role: "user",
+                parts: [
+                  {
+                    text: message
+                  }
+                ]
+              }
+            ]
+          })
+        }
+      );
 
       const data = await response.json();
 
       if (!response.ok) {
         return new Response(
           JSON.stringify({
-            error: data?.error?.message || "OpenAI API request failed."
+            error:
+              data?.error?.message ||
+              "Gemini API request failed."
           }),
-          { status: response.status, headers: corsHeaders }
+          {
+            status: response.status,
+            headers: corsHeaders
+          }
         );
       }
 
+      const reply =
+        data?.candidates?.[0]?.content?.parts
+          ?.map(part => part.text || "")
+          .join("")
+          .trim();
+
       return new Response(
         JSON.stringify({
-          reply: data.output_text || "I couldn't generate a response."
+          reply: reply || "ARES could not generate a response."
         }),
-        { status: 200, headers: corsHeaders }
+        {
+          status: 200,
+          headers: corsHeaders
+        }
       );
 
     } catch (error) {
       return new Response(
         JSON.stringify({
-          error: "Server error."
+          error: error?.message || "Server error."
         }),
-        { status: 500, headers: corsHeaders }
+        {
+          status: 500,
+          headers: corsHeaders
+        }
       );
     }
   }
