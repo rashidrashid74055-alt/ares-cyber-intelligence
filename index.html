@@ -2,39 +2,19 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#0b0d10">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>ARES AI</title>
 
 <style>
-*{
-  box-sizing:border-box;
-  margin:0;
-  padding:0;
-}
-
-:root{
-  --bg:#0b0d10;
-  --panel:#111418;
-  --panel2:#171a1f;
-  --border:#292e35;
-  --text:#f4f4f5;
-  --muted:#969ba5;
-  --accent:#19d3a2;
-  --accent2:#0fa67f;
-  --user:#19352f;
-  --danger:#ef6b73;
-}
+*{box-sizing:border-box}
 
 body{
-  font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-  background:var(--bg);
-  color:var(--text);
+  margin:0;
+  background:#0b0d10;
+  color:#eee;
+  font-family:Arial,system-ui,sans-serif;
   height:100vh;
-  overflow:hidden;
 }
-
-/* APP */
 
 .app{
   height:100vh;
@@ -42,479 +22,273 @@ body{
 }
 
 /* SIDEBAR */
-
 .sidebar{
-  width:270px;
-  background:#0e1013;
-  border-right:1px solid var(--border);
+  width:250px;
+  background:#111318;
+  border-right:1px solid #292d33;
   display:flex;
   flex-direction:column;
-  transition:.25s;
-  flex-shrink:0;
-}
-
-.brand{
-  height:64px;
-  display:flex;
-  align-items:center;
-  gap:11px;
-  padding:0 18px;
-  border-bottom:1px solid var(--border);
 }
 
 .logo{
-  width:34px;
-  height:34px;
-  border:1px solid var(--accent);
-  border-radius:10px;
-  display:grid;
-  place-items:center;
-  color:var(--accent);
-  font-weight:800;
+  padding:20px;
+  font-size:20px;
+  font-weight:bold;
+  border-bottom:1px solid #292d33;
 }
 
-.brand strong{
-  font-size:15px;
-  letter-spacing:1px;
+.logo span{
+  color:#19d3a2;
 }
 
-.brand small{
-  display:block;
-  color:var(--muted);
-  font-size:9px;
-  letter-spacing:2px;
-  margin-top:2px;
-}
-
-.new-chat{
-  margin:14px;
-  border:1px solid var(--border);
-  background:#171a1f;
-  color:var(--text);
-  border-radius:10px;
-  padding:11px 13px;
+.new{
+  margin:15px;
+  padding:12px;
+  background:#191d22;
+  color:white;
+  border:1px solid #30353c;
+  border-radius:8px;
   cursor:pointer;
-  text-align:left;
-  font-size:14px;
-}
-
-.new-chat:hover{
-  border-color:#3a414a;
-  background:#1c2025;
-}
-
-.history-title{
-  padding:8px 16px;
-  color:#777d87;
-  font-size:11px;
-  text-transform:uppercase;
-  letter-spacing:1px;
 }
 
 .history{
-  flex:1;
+  padding:10px;
   overflow:auto;
-  padding:0 9px;
 }
 
-.chat-item{
-  padding:11px 10px;
-  border-radius:8px;
-  color:#c7cbd1;
-  font-size:13px;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
+.history div{
+  padding:10px;
+  color:#aaa;
+  border-radius:7px;
   cursor:pointer;
-  margin-bottom:3px;
 }
 
-.chat-item:hover,
-.chat-item.active{
-  background:#181c21;
-  color:#fff;
-}
-
-.sidebar-bottom{
-  border-top:1px solid var(--border);
-  padding:13px 15px;
-  color:#777d87;
-  font-size:11px;
+.history div:hover{
+  background:#1b1f24;
+  color:white;
 }
 
 /* MAIN */
-
 .main{
   flex:1;
-  min-width:0;
   display:flex;
   flex-direction:column;
-  background:
-    radial-gradient(circle at 50% 20%,rgba(25,211,162,.055),transparent 35%),
-    var(--bg);
+  min-width:0;
 }
 
-/* TOPBAR */
-
-.topbar{
-  height:64px;
-  border-bottom:1px solid var(--border);
+.header{
+  height:58px;
+  border-bottom:1px solid #292d33;
   display:flex;
   align-items:center;
   justify-content:space-between;
   padding:0 18px;
-  flex-shrink:0;
 }
 
-.menu-btn{
-  display:none;
-  border:0;
-  background:transparent;
-  color:white;
-  font-size:23px;
-  cursor:pointer;
+.online{
+  color:#19d3a2;
+  font-size:12px;
 }
 
-.model-name{
-  font-size:14px;
-  font-weight:600;
-}
-
-.status{
-  font-size:11px;
-  color:var(--accent);
-  display:flex;
-  align-items:center;
-  gap:6px;
-}
-
-.dot{
-  width:7px;
-  height:7px;
-  background:var(--accent);
-  border-radius:50%;
-  box-shadow:0 0 10px var(--accent);
-}
-
-/* CHAT */
-
-.chat{
+/* MESSAGES */
+.messages{
   flex:1;
   overflow-y:auto;
-  scroll-behavior:smooth;
-  padding:30px 20px 150px;
+  padding:25px 15px 130px;
 }
-
-.chat-inner{
-  max-width:820px;
-  margin:auto;
-}
-
-/* WELCOME */
-
-.welcome{
-  min-height:60vh;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  align-items:center;
-  text-align:center;
-  padding:20px;
-}
-
-.welcome-logo{
-  width:64px;
-  height:64px;
-  border:1px solid var(--accent);
-  border-radius:20px;
-  display:grid;
-  place-items:center;
-  color:var(--accent);
-  font-size:25px;
-  font-weight:800;
-  margin-bottom:20px;
-  box-shadow:0 0 35px rgba(25,211,162,.08);
-}
-
-.welcome h1{
-  font-size:32px;
-  margin-bottom:10px;
-}
-
-.welcome p{
-  color:var(--muted);
-  max-width:560px;
-  line-height:1.6;
-}
-
-.suggestions{
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:10px;
-  width:100%;
-  max-width:620px;
-  margin-top:28px;
-}
-
-.suggestion{
-  padding:14px;
-  border:1px solid var(--border);
-  background:#111418;
-  border-radius:12px;
-  color:#cfd2d7;
-  cursor:pointer;
-  text-align:left;
-  font-size:13px;
-}
-
-.suggestion:hover{
-  border-color:#3c444d;
-}
-
-/* MESSAGE */
 
 .message{
+  max-width:800px;
+  margin:0 auto 25px;
   display:flex;
-  gap:13px;
-  margin-bottom:28px;
+  gap:12px;
 }
 
 .avatar{
-  width:31px;
-  height:31px;
-  border-radius:9px;
-  display:grid;
-  place-items:center;
-  flex-shrink:0;
-  font-size:11px;
-  font-weight:800;
+  min-width:32px;
+  height:32px;
+  border-radius:8px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#19332d;
+  color:#19d3a2;
+  font-weight:bold;
 }
 
 .user .avatar{
-  background:#26312f;
-  color:#c9fff1;
+  background:#30343a;
+  color:white;
 }
 
-.assistant .avatar{
-  background:#122a25;
-  border:1px solid #1c705c;
-  color:var(--accent);
-}
-
-.message-body{
-  min-width:0;
+.content{
   flex:1;
+  min-width:0;
 }
 
-.message-name{
+.name{
   font-size:12px;
-  color:#9298a2;
+  color:#888;
   margin-bottom:7px;
 }
 
-.message-text{
-  line-height:1.65;
-  color:#e7e8ea;
+.text{
+  line-height:1.6;
   white-space:pre-wrap;
-  word-break:break-word;
+  word-wrap:break-word;
 }
 
-.user .message-text{
-  background:var(--user);
-  padding:11px 14px;
-  border-radius:12px;
+.user .text{
+  background:#19352f;
+  padding:10px 13px;
+  border-radius:10px;
   display:inline-block;
 }
 
 /* CODE */
-
 .code{
-  background:#090b0e;
-  border:1px solid #282e35;
-  border-radius:10px;
   margin:12px 0;
+  background:#07090b;
+  border:1px solid #30353b;
+  border-radius:8px;
   overflow:hidden;
 }
 
-.code-head{
+.codebar{
+  padding:7px 10px;
+  border-bottom:1px solid #30353b;
+  color:#888;
+  font-size:11px;
   display:flex;
   justify-content:space-between;
-  align-items:center;
-  padding:8px 11px;
-  color:#858b95;
-  font-size:10px;
-  border-bottom:1px solid #282e35;
 }
 
-.code button{
+.codebar button{
+  background:none;
   border:0;
-  background:transparent;
-  color:#aaa;
+  color:#19d3a2;
   cursor:pointer;
 }
 
-.code pre{
+pre{
+  margin:0;
   padding:14px;
   overflow:auto;
-  font-family:ui-monospace,SFMono-Regular,Consolas,monospace;
-  font-size:12px;
-  line-height:1.6;
-  color:#d9f8ee;
+  color:#dffdf5;
 }
 
 /* ACTIONS */
-
 .actions{
   display:flex;
   gap:5px;
-  margin-top:9px;
+  margin-top:8px;
 }
 
-.action{
-  border:1px solid transparent;
-  background:transparent;
-  color:#737983;
-  border-radius:7px;
-  padding:6px 8px;
+.actions button{
+  background:none;
+  border:0;
+  color:#777;
   cursor:pointer;
-  font-size:13px;
+  padding:5px 7px;
 }
 
-.action:hover{
-  background:#181c21;
-  color:#e5e7eb;
+.actions button:hover{
+  color:white;
 }
 
-.action.active{
-  color:var(--accent);
-}
-
-/* COMPOSER */
-
-.composer-wrap{
+/* INPUT */
+.bottom{
   position:fixed;
   bottom:0;
-  left:270px;
+  left:250px;
   right:0;
-  padding:18px 20px 22px;
-  background:linear-gradient(transparent,var(--bg) 35%);
+  background:#0b0d10;
+  padding:12px 15px 18px;
 }
 
-.composer{
-  max-width:820px;
+.inputbox{
+  max-width:800px;
   margin:auto;
-  border:1px solid #343a42;
-  background:#111418;
-  border-radius:15px;
   display:flex;
   align-items:flex-end;
-  padding:8px;
-  box-shadow:0 10px 35px rgba(0,0,0,.3);
+  background:#15191e;
+  border:1px solid #353b42;
+  border-radius:12px;
+  padding:7px;
 }
 
 textarea{
   flex:1;
+  min-height:42px;
+  max-height:140px;
   resize:none;
   border:0;
   outline:0;
-  background:transparent;
-  color:#fff;
-  padding:10px 11px;
-  min-height:44px;
-  max-height:150px;
+  background:none;
+  color:white;
+  padding:11px;
   font:inherit;
 }
 
-textarea::placeholder{
-  color:#676d76;
+button{
+  font:inherit;
 }
 
-.send,
-.mic{
-  width:40px;
-  height:40px;
+.mic,.send{
+  width:42px;
+  height:42px;
   border:0;
-  border-radius:10px;
+  border-radius:9px;
   cursor:pointer;
-  display:grid;
-  place-items:center;
-  flex-shrink:0;
 }
 
 .mic{
-  background:transparent;
-  color:#8a9099;
-  font-size:17px;
-}
-
-.mic:hover{
-  background:#1a1e23;
-  color:white;
+  background:none;
+  color:#aaa;
 }
 
 .send{
-  background:var(--accent);
-  color:#07130f;
-  font-weight:800;
+  background:#19d3a2;
+  color:#06110d;
+  font-weight:bold;
 }
 
-.send:hover{
-  background:#25e1af;
-}
-
-.send:disabled{
-  opacity:.35;
-  cursor:not-allowed;
-}
-
-.disclaimer{
-  max-width:820px;
-  margin:7px auto 0;
+.note{
+  max-width:800px;
+  margin:6px auto 0;
   text-align:center;
+  color:#666;
   font-size:10px;
-  color:#656a73;
 }
 
-/* MOBILE */
-
-@media(max-width:760px){
+@media(max-width:700px){
 
   .sidebar{
-    position:fixed;
-    z-index:20;
-    top:0;
-    bottom:0;
-    left:-280px;
-    box-shadow:15px 0 50px rgba(0,0,0,.5);
+    width:190px;
   }
 
-  .sidebar.open{
+  .bottom{
+    left:190px;
+  }
+
+  .message{
+    max-width:100%;
+  }
+}
+
+@media(max-width:500px){
+
+  .sidebar{
+    display:none;
+  }
+
+  .bottom{
     left:0;
   }
 
-  .menu-btn{
-    display:block;
-  }
-
-  .composer-wrap{
-    left:0;
-    padding:12px 10px 15px;
-  }
-
-  .chat{
-    padding:22px 13px 135px;
-  }
-
-  .topbar{
-    padding:0 13px;
-  }
-
-  .suggestions{
-    grid-template-columns:1fr;
-  }
-
-  .welcome h1{
-    font-size:27px;
+  .messages{
+    padding-left:10px;
+    padding-right:10px;
   }
 }
 </style>
@@ -524,197 +298,351 @@ textarea::placeholder{
 
 <div class="app">
 
-  <!-- SIDEBAR -->
+  <aside class="sidebar">
 
-  <aside class="sidebar" id="sidebar">
-
-    <div class="brand">
-      <div class="logo">A</div>
-      <div>
-        <strong>ARES AI</strong>
-        <small>CYBER INTELLIGENCE</small>
-      </div>
+    <div class="logo">
+      <span>A</span>RES AI
     </div>
 
-    <button class="new-chat" onclick="newChat()">
-      ＋ New chat
+    <button class="new" onclick="newChat()">
+      + New chat
     </button>
-
-    <div class="history-title">Recent chats</div>
 
     <div class="history" id="history"></div>
 
-    <div class="sidebar-bottom">
-      ARES AI · Frontend mode
-    </div>
-
   </aside>
 
-  <!-- MAIN -->
 
   <main class="main">
 
-    <header class="topbar">
-      <button class="menu-btn" onclick="toggleSidebar()">☰</button>
-
-      <div class="model-name">
-        ARES AI
-      </div>
-
-      <div class="status">
-        <span class="dot"></span>
-        Online
-      </div>
+    <header class="header">
+      <b>ARES AI</b>
+      <span class="online">● Online</span>
     </header>
 
-    <section class="chat" id="chat">
-      <div class="chat-inner" id="messages"></div>
-    </section>
-
-    <div class="composer-wrap">
-
-      <form class="composer" id="form">
-
-        <textarea
-          id="input"
-          rows="1"
-          placeholder="Message ARES AI..."
-          autocomplete="off"
-        ></textarea>
-
-        <button
-          type="button"
-          class="mic"
-          id="mic"
-          title="Voice input"
-        >🎙</button>
-
-        <button
-          type="submit"
-          class="send"
-          id="send"
-        >➤</button>
-
-      </form>
-
-      <div class="disclaimer">
-        ARES AI can make mistakes. Verify important security findings before acting.
-      </div>
-
-    </div>
+    <section class="messages" id="messages"></section>
 
   </main>
 
 </div>
 
 
+<div class="bottom">
+
+  <form class="inputbox" id="form">
+
+    <textarea
+      id="input"
+      placeholder="Message ARES AI..."
+    ></textarea>
+
+    <button
+      type="button"
+      class="mic"
+      onclick="voice()"
+    >🎙</button>
+
+    <button
+      type="submit"
+      class="send"
+    >➤</button>
+
+  </form>
+
+  <div class="note">
+    ARES AI can make mistakes. Verify important security information.
+  </div>
+
+</div>
+
+
 <script>
 
-/* =========================
-   STATE
-========================= */
+let chats=[];
+let current=[];
 
-const STORAGE_KEY = "ares_ai_chats_v3";
-
-let chats = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
-
-let currentChatId = null;
+const messages=document.getElementById("messages");
+const input=document.getElementById("input");
+const form=document.getElementById("form");
+const history=document.getElementById("history");
 
 
-/* =========================
-   ELEMENTS
-========================= */
+/* START */
+function start(){
 
-const messages = document.getElementById("messages");
-const history = document.getElementById("history");
-const input = document.getElementById("input");
-const form = document.getElementById("form");
-const send = document.getElementById("send");
-const sidebar = document.getElementById("sidebar");
+  if(current.length===0){
 
+    addMessage(
+      "assistant",
+      "Hello! Main ARES AI hoon.\n\nTum mujhse cybersecurity, Linux, networking, web security, programming aur security concepts ke baare mein pooch sakte ho.\n\nExample:\n\n\"Explain DNS\"\n\"Linux security commands do\"\n\"What is an HTTP request?\""
+    );
 
-/* =========================
-   CHAT MANAGEMENT
-========================= */
-
-function saveChats(){
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(chats));
-}
-
-
-function createChat(){
-
-  const chat = {
-    id: Date.now().toString(),
-    title: "New chat",
-    messages: []
-  };
-
-  chats.unshift(chat);
-
-  currentChatId = chat.id;
-
-  saveChats();
-
-  renderHistory();
-  renderMessages();
+  }
 
 }
 
 
+/* SEND */
+form.addEventListener("submit",function(e){
+
+  e.preventDefault();
+
+  const text=input.value.trim();
+
+  if(!text)return;
+
+  input.value="";
+
+  addMessage("user",text);
+
+  setTimeout(function(){
+
+    const answer=getAnswer(text);
+
+    addMessage("assistant",answer);
+
+  },500);
+
+});
+
+
+/* ADD MESSAGE */
+function addMessage(role,text){
+
+  current.push({
+    role:role,
+    text:text
+  });
+
+  const box=document.createElement("div");
+
+  box.className="message "+role;
+
+  const avatar=document.createElement("div");
+
+  avatar.className="avatar";
+
+  avatar.textContent=
+    role==="user" ? "U" : "A";
+
+  const content=document.createElement("div");
+
+  content.className="content";
+
+  const name=document.createElement("div");
+
+  name.className="name";
+
+  name.textContent=
+    role==="user" ? "You" : "ARES AI";
+
+  const messageText=document.createElement("div");
+
+  messageText.className="text";
+
+  messageText.innerHTML=format(text);
+
+  content.appendChild(name);
+  content.appendChild(messageText);
+
+
+  if(role==="assistant"){
+
+    const actions=document.createElement("div");
+
+    actions.className="actions";
+
+    actions.innerHTML=`
+      <button onclick="copyAnswer(this)">⧉</button>
+      <button onclick="like(this)">♡</button>
+      <button onclick="speak(this)">🔊</button>
+      <button onclick="share(this)">↗</button>
+    `;
+
+    content.appendChild(actions);
+
+  }
+
+
+  box.appendChild(avatar);
+  box.appendChild(content);
+
+  messages.appendChild(box);
+
+  messages.scrollTop=messages.scrollHeight;
+
+}
+
+
+/* FORMAT TEXT + CODE */
+function format(text){
+
+  let safe=text
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;");
+
+  safe=safe.replace(
+    /```([\s\S]*?)```/g,
+    function(match,code){
+
+      return `
+      <div class="code">
+
+        <div class="codebar">
+          <span>COMMAND</span>
+          <button onclick="copyCode(this)">
+            Copy
+          </button>
+        </div>
+
+        <pre>${code.trim()}</pre>
+
+      </div>
+      `;
+
+    }
+  );
+
+  return safe;
+
+}
+
+
+/* COPY ANSWER */
+function copyAnswer(button){
+
+  const text=
+    button
+    .closest(".content")
+    .querySelector(".text")
+    .innerText;
+
+  navigator.clipboard.writeText(text);
+
+}
+
+
+/* COPY CODE */
+function copyCode(button){
+
+  const code=
+    button
+    .closest(".code")
+    .querySelector("pre")
+    .innerText;
+
+  navigator.clipboard.writeText(code);
+
+  button.innerText="Copied";
+
+  setTimeout(()=>{
+    button.innerText="Copy";
+  },1000);
+
+}
+
+
+/* LIKE */
+function like(button){
+
+  button.style.color=
+    button.style.color==="rgb(25, 211, 162)"
+    ? "#777"
+    : "#19d3a2";
+
+}
+
+
+/* SPEAK */
+function speak(button){
+
+  const text=
+    button
+    .closest(".content")
+    .querySelector(".text")
+    .innerText;
+
+  speechSynthesis.cancel();
+
+  const speech=
+    new SpeechSynthesisUtterance(text);
+
+  speech.rate=1;
+
+  speechSynthesis.speak(speech);
+
+}
+
+
+/* SHARE */
+async function share(button){
+
+  const text=
+    button
+    .closest(".content")
+    .querySelector(".text")
+    .innerText;
+
+  if(navigator.share){
+
+    await navigator.share({
+      title:"ARES AI",
+      text:text
+    });
+
+  }else{
+
+    navigator.clipboard.writeText(text);
+
+    alert("Answer copied.");
+
+  }
+
+}
+
+
+/* NEW CHAT */
 function newChat(){
 
-  createChat();
+  if(current.length>0){
 
-  input.focus();
+    chats.push([...current]);
 
-  if(window.innerWidth <= 760){
-    sidebar.classList.remove("open");
-  }
-}
-
-
-function getCurrentChat(){
-
-  return chats.find(c => c.id === currentChatId);
-
-}
-
-
-function ensureChat(){
-
-  if(!currentChatId || !getCurrentChat()){
-    createChat();
   }
 
+  current=[];
+
+  messages.innerHTML="";
+
+  start();
+
+  updateHistory();
+
 }
 
 
-function renderHistory(){
+/* HISTORY */
+function updateHistory(){
 
-  history.innerHTML = "";
+  history.innerHTML="";
 
-  chats.forEach(chat => {
+  chats.forEach((chat,i)=>{
 
-    const item = document.createElement("div");
+    const item=document.createElement("div");
 
-    item.className =
-      "chat-item " +
-      (chat.id === currentChatId ? "active" : "");
+    item.textContent=
+      "Chat "+(i+1);
 
-    item.textContent =
-      chat.title || "New chat";
+    item.onclick=function(){
 
-    item.onclick = () => {
+      current=chat;
 
-      currentChatId = chat.id;
+      messages.innerHTML="";
 
-      renderHistory();
-      renderMessages();
-
-      if(window.innerWidth <= 760){
-        sidebar.classList.remove("open");
-      }
+      current.forEach(msg=>{
+        addMessage(msg.role,msg.text);
+      });
 
     };
 
@@ -725,298 +653,247 @@ function renderHistory(){
 }
 
 
-/* =========================
-   RENDER MESSAGES
-========================= */
+/* VOICE */
+function voice(){
 
-function renderMessages(){
+  const SpeechRecognition=
+    window.SpeechRecognition ||
+    window.webkitSpeechRecognition;
 
-  const chat = getCurrentChat();
+  if(!SpeechRecognition){
 
-  messages.innerHTML = "";
-
-  if(!chat || chat.messages.length === 0){
-
-    messages.innerHTML = `
-      <div class="welcome">
-
-        <div class="welcome-logo">A</div>
-
-        <h1>How can I help?</h1>
-
-        <p>
-          Ask ARES AI about cybersecurity concepts,
-          defensive analysis, Linux, networking,
-          web security, code and security learning.
-        </p>
-
-        <div class="suggestions">
-
-          <button class="suggestion"
-            onclick="useSuggestion('Explain how DNS works')">
-            Explain how DNS works
-          </button>
-
-          <button class="suggestion"
-            onclick="useSuggestion('Give me a beginner Linux security checklist')">
-            Linux security checklist
-          </button>
-
-          <button class="suggestion"
-            onclick="useSuggestion('Explain this HTTP request')">
-            Analyze HTTP request
-          </button>
-
-          <button class="suggestion"
-            onclick="useSuggestion('Teach me network security step by step')">
-            Learn network security
-          </button>
-
-        </div>
-
-      </div>
-    `;
+    alert("Voice input is not supported.");
 
     return;
-  }
-
-
-  chat.messages.forEach((msg,index) => {
-
-    addMessageToDOM(
-      msg.role,
-      msg.text,
-      index
-    );
-
-  });
-
-  scrollBottom();
-
-}
-
-
-function addMessageToDOM(role,text,index){
-
-  const wrapper = document.createElement("div");
-
-  wrapper.className =
-    "message " +
-    (role === "user" ? "user" : "assistant");
-
-  const avatar =
-    role === "user" ? "U" : "A";
-
-  wrapper.innerHTML = `
-
-    <div class="avatar">${avatar}</div>
-
-    <div class="message-body">
-
-      <div class="message-name">
-        ${role === "user" ? "You" : "ARES AI"}
-      </div>
-
-      <div class="message-text">
-        ${formatText(text)}
-      </div>
-
-      ${
-        role === "assistant"
-        ?
-        `
-        <div class="actions">
-
-          <button
-            class="action"
-            onclick="copyAnswer(${index})"
-            title="Copy"
-          >⧉</button>
-
-          <button
-            class="action"
-            onclick="likeAnswer(this)"
-            title="Like"
-          >♡</button>
-
-          <button
-            class="action"
-            onclick="dislikeAnswer(this)"
-            title="Dislike"
-          >♧</button>
-
-          <button
-            class="action"
-            onclick="speakAnswer(${index})"
-            title="Read aloud"
-          >🔊</button>
-
-          <button
-            class="action"
-            onclick="shareAnswer(${index})"
-            title="Share"
-          >↗</button>
-
-        </div>
-        `
-        :
-        ""
-      }
-
-    </div>
-  `;
-
-  messages.appendChild(wrapper);
-
-}
-
-
-/* =========================
-   TEXT FORMATTER
-========================= */
-
-function escapeHTML(text){
-
-  return text
-    .replace(/&/g,"&amp;")
-    .replace(/</g,"&lt;")
-    .replace(/>/g,"&gt;");
-
-}
-
-
-function formatText(text){
-
-  const escaped = escapeHTML(text);
-
-  const parts =
-    escaped.split(/```([\s\S]*?)```/g);
-
-  let output = "";
-
-  parts.forEach((part,i)=>{
-
-    if(i % 2 === 1){
-
-      output += `
-        <div class="code">
-
-          <div class="code-head">
-            <span>CODE</span>
-            <button onclick="copyText(this.closest('.code').querySelector('pre').innerText)">
-              Copy
-            </button>
-          </div>
-
-          <pre>${part.trim()}</pre>
-
-        </div>
-      `;
-
-    }else{
-
-      output += part;
-
-    }
-
-  });
-
-  return output;
-
-}
-
-
-/* =========================
-   SEND MESSAGE
-========================= */
-
-form.addEventListener("submit", async(e)=>{
-
-  e.preventDefault();
-
-  const text = input.value.trim();
-
-  if(!text) return;
-
-  ensureChat();
-
-  const chat = getCurrentChat();
-
-  chat.messages.push({
-    role:"user",
-    text:text
-  });
-
-  if(chat.title === "New chat"){
-
-    chat.title =
-      text.substring(0,42) +
-      (text.length > 42 ? "..." : "");
 
   }
 
-  input.value = "";
+  const recognition=
+    new SpeechRecognition();
 
-  autoResize();
+  recognition.lang="en-IN";
 
-  saveChats();
+  recognition.start();
 
-  renderHistory();
-  renderMessages();
+  recognition.onresult=function(event){
 
-  send.disabled = true;
+    input.value=
+      event.results[0][0].transcript;
 
-  await fakeAIResponse(text);
-
-  send.disabled = false;
-
-});
-
-
-/* =========================
-   AI RESPONSE
-========================= */
-
-async function fakeAIResponse(question){
-
-  await new Promise(resolve =>
-    setTimeout(resolve,700)
-  );
-
-  const answer = generateResponse(question);
-
-  const chat = getCurrentChat();
-
-  chat.messages.push({
-    role:"assistant",
-    text:answer
-  });
-
-  saveChats();
-
-  renderMessages();
+  };
 
 }
 
 
-/*
-  FRONTEND DEMO RESPONSE ENGINE.
+/* BASIC AI ANSWERS */
+function getAnswer(question){
 
-  IMPORTANT:
-  This is NOT a real AI model.
-  Connect your backend/API here later.
-*/
-
-function generateResponse(q){
-
-  const text = q.toLowerCase();
+  const q=question.toLowerCase();
 
 
-  if(text.includes("dns")){
+  /* HELLO */
+  if(
+    q==="hi" ||
+    q==="hello" ||
+    q.includes("hello")
+  ){
 
-    return `DNS ka basic kaam domain name ko IP address mein resolve karna hai.
+    return `Hello! 👋
+
+Main ARES AI hoon.
+
+Tum mujhse cybersecurity, Linux, networking, web security aur programming ke questions pooch sakte ho.
 
 Example:
 
-```bash
+"Explain DNS"
+"Linux ke useful commands do"
+"TCP handshake explain karo"
+"HTTP kya hota hai?"`;
+
+  }
+
+
+  /* DNS */
+  if(q.includes("dns")){
+
+    return `DNS ka matlab Domain Name System hai.
+
+Iska main kaam domain name ko IP address mein resolve karna hota hai.
+
+Example:
+
+\`\`\`bash
 nslookup example.com
+\`\`\`
+
+Aur:
+
+\`\`\`bash
+dig example.com
+\`\`\`
+
+Simple flow:
+
+Browser → DNS resolver → DNS server → IP address → Website`;
+
+  }
+
+
+  /* LINUX */
+  if(
+    q.includes("linux") ||
+    q.includes("linux command")
+  ){
+
+    return `Linux ke kuch basic security/system commands:
+
+\`\`\`bash
+whoami
+uname -a
+pwd
+ls -la
+ip addr
+ip route
+ss -tulpn
+ps aux
+df -h
+free -h
+\`\`\`
+
+Ye commands apne device ya authorized lab par system/network information samajhne ke liye useful hain.`;
+
+  }
+
+
+  /* NETWORK */
+  if(
+    q.includes("network") ||
+    q.includes("networking")
+  ){
+
+    return `Networking learning ke basic topics:
+
+1. IP address
+2. MAC address
+3. Subnet
+4. Gateway
+5. DNS
+6. TCP
+7. UDP
+8. HTTP/HTTPS
+9. Routing
+10. Firewall
+
+Useful commands:
+
+\`\`\`bash
+ip addr
+ip route
+ping example.com
+ss -tulpn
+nslookup example.com
+\`\`\``;
+
+  }
+
+
+  /* HTTP */
+  if(
+    q.includes("http") ||
+    q.includes("https")
+  ){
+
+    return `HTTP web communication ka protocol hai.
+
+Common methods:
+
+GET
+POST
+PUT
+PATCH
+DELETE
+
+Example:
+
+\`\`\`http
+GET / HTTP/1.1
+Host: example.com
+\`\`\`
+
+HTTP request mein method, URL/path, headers aur kabhi request body hoti hai.`;
+
+  }
+
+
+  /* TCP */
+  if(q.includes("tcp")){
+
+    return `TCP ek connection-oriented transport protocol hai.
+
+Basic TCP connection mein commonly:
+
+1. SYN
+2. SYN-ACK
+3. ACK
+
+Is process ko TCP three-way handshake kehte hain.`;
+
+  }
+
+
+  /* IP */
+  if(
+    q.includes("ip address") ||
+    q==="ip"
+  ){
+
+    return `IP address network par kisi device/interface ko identify karne ke liye use hota hai.
+
+Local IP dekhne ke liye:
+
+\`\`\`bash
+ip addr
+\`\`\`
+
+Routing table dekhne ke liye:
+
+\`\`\`bash
+ip route
+\`\`\``;
+
+  }
+
+
+  /* PASSWORD */
+  if(q.includes("password")){
+
+    return `Strong password ke liye:
+
+• Long password/passphrase use karo
+• Har account ke liye unique password
+• Password manager use kar sakte ho
+• 2FA/MFA enable karo
+• Password kisi ke saath share mat karo`;
+
+  }
+
+
+  /* DEFAULT */
+  return `Maine tumhara message receive kiya:
+
+"${question}"
+
+Is basic version mein common cybersecurity, Linux, networking aur programming questions ke built-in answers hain.
+
+Agar tum chahte ho ki ARES AI **literally kisi bhi normal question ka dynamic answer** de, to next step mein humein is website ko ek real AI backend/API se connect karna hoga. API key ko directly HTML mein rakhna safe nahi hota.`;
+
+}
+
+
+start();
+
+</script>
+
+</body>
+</html>
