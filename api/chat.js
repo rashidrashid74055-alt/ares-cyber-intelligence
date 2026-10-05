@@ -44,7 +44,7 @@ export default {
       }
 
       const response = await fetch(
-        "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
+        "https://generativelanguage.googleapis.com/v1beta/interactions",
         {
           method: "POST",
           headers: {
@@ -52,24 +52,10 @@ export default {
             "x-goog-api-key": apiKey
           },
           body: JSON.stringify({
-            systemInstruction: {
-              parts: [
-                {
-                  text:
-                    "You are ARES AI, a helpful general-purpose AI assistant. Answer clearly, accurately and naturally. For cybersecurity topics, focus on authorized testing, defensive security, education, troubleshooting and safe lab environments. Do not provide instructions that facilitate malware, credential theft, unauthorized access, evasion, destructive attacks or other harmful activity."
-                }
-              ]
-            },
-            contents: [
-              {
-                role: "user",
-                parts: [
-                  {
-                    text: message
-                  }
-                ]
-              }
-            ]
+            model: "gemini-3.8-flash",
+            input: message,
+            system_instruction:
+              "You are ARES AI, a helpful general-purpose AI assistant. Answer clearly, accurately and naturally. For cybersecurity topics, focus on authorized testing, defensive security, education, troubleshooting and safe lab environments. Do not provide instructions that facilitate malware, credential theft, unauthorized access, evasion, destructive attacks or other harmful activity."
           })
         }
       );
@@ -91,15 +77,16 @@ export default {
       }
 
       const reply =
-        data?.candidates?.[0]?.content?.parts
-          ?.map(part => part.text || "")
-          .join("")
-          .trim();
+        data?.output
+          ?.filter(item => item.type === "text")
+          ?.map(item => item.text || "")
+          ?.join("")
+          ?.trim() ||
+        data?.output_text ||
+        "ARES could not generate a response.";
 
       return new Response(
-        JSON.stringify({
-          reply: reply || "ARES could not generate a response."
-        }),
+        JSON.stringify({ reply }),
         {
           status: 200,
           headers: corsHeaders
