@@ -2,16 +2,20 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>ARES AI</title>
 
 <style>
-*{box-sizing:border-box}
+
+*{
+  box-sizing:border-box;
+}
 
 body{
   margin:0;
   background:#0b0d10;
-  color:#eee;
+  color:#f1f1f1;
   font-family:Arial,system-ui,sans-serif;
   height:100vh;
 }
@@ -22,8 +26,9 @@ body{
 }
 
 /* SIDEBAR */
+
 .sidebar{
-  width:250px;
+  width:230px;
   background:#111318;
   border-right:1px solid #292d33;
   display:flex;
@@ -31,8 +36,8 @@ body{
 }
 
 .logo{
-  padding:20px;
-  font-size:20px;
+  padding:18px;
+  font-size:18px;
   font-weight:bold;
   border-bottom:1px solid #292d33;
 }
@@ -41,204 +46,252 @@ body{
   color:#19d3a2;
 }
 
-.new{
-  margin:15px;
-  padding:12px;
+.newchat{
+  margin:12px;
+  padding:11px;
+  border:1px solid #30353b;
   background:#191d22;
   color:white;
-  border:1px solid #30353c;
   border-radius:8px;
   cursor:pointer;
 }
 
+.newchat:hover{
+  background:#20252b;
+}
+
 .history{
-  padding:10px;
+  padding:8px;
   overflow:auto;
 }
 
-.history div{
-  padding:10px;
-  color:#aaa;
+.history-item{
+  padding:9px;
+  color:#999;
   border-radius:7px;
   cursor:pointer;
+  font-size:13px;
 }
 
-.history div:hover{
+.history-item:hover{
   background:#1b1f24;
   color:white;
 }
 
 /* MAIN */
+
 .main{
   flex:1;
+  min-width:0;
   display:flex;
   flex-direction:column;
-  min-width:0;
 }
 
 .header{
-  height:58px;
+  height:55px;
   border-bottom:1px solid #292d33;
   display:flex;
-  align-items:center;
   justify-content:space-between;
-  padding:0 18px;
+  align-items:center;
+  padding:0 16px;
 }
 
 .online{
   color:#19d3a2;
-  font-size:12px;
+  font-size:11px;
 }
 
-/* MESSAGES */
+/* CHAT */
+
 .messages{
   flex:1;
   overflow-y:auto;
-  padding:25px 15px 130px;
+  padding:25px 15px 120px;
 }
 
 .message{
-  max-width:800px;
-  margin:0 auto 25px;
+  width:100%;
   display:flex;
-  gap:12px;
+  margin-bottom:25px;
+}
+
+.message-inner{
+  max-width:780px;
+  display:flex;
+  gap:10px;
+}
+
+/* ARES LEFT */
+
+.assistant{
+  justify-content:flex-start;
+}
+
+.assistant .message-inner{
+  margin-right:auto;
+}
+
+/* USER RIGHT */
+
+.user{
+  justify-content:flex-end;
+}
+
+.user .message-inner{
+  flex-direction:row-reverse;
+  margin-left:auto;
 }
 
 .avatar{
-  min-width:32px;
+  width:32px;
   height:32px;
+  min-width:32px;
   border-radius:8px;
   display:flex;
-  align-items:center;
   justify-content:center;
-  background:#19332d;
-  color:#19d3a2;
+  align-items:center;
   font-weight:bold;
+  font-size:12px;
+}
+
+.assistant .avatar{
+  background:#12352d;
+  color:#19d3a2;
 }
 
 .user .avatar{
-  background:#30343a;
+  background:#30353b;
   color:white;
 }
 
 .content{
-  flex:1;
-  min-width:0;
+  max-width:680px;
 }
 
 .name{
-  font-size:12px;
-  color:#888;
-  margin-bottom:7px;
+  font-size:11px;
+  color:#777;
+  margin-bottom:6px;
 }
 
 .text{
   line-height:1.6;
   white-space:pre-wrap;
-  word-wrap:break-word;
+  word-break:break-word;
 }
 
+/* USER MESSAGE */
+
 .user .text{
-  background:#19352f;
+  background:#193b33;
   padding:10px 13px;
-  border-radius:10px;
-  display:inline-block;
+  border-radius:12px;
+  color:#f5f5f5;
 }
 
 /* CODE */
+
 .code{
   margin:12px 0;
   background:#07090b;
-  border:1px solid #30353b;
+  border:1px solid #30353a;
   border-radius:8px;
   overflow:hidden;
 }
 
-.codebar{
-  padding:7px 10px;
-  border-bottom:1px solid #30353b;
-  color:#888;
-  font-size:11px;
+.code-top{
   display:flex;
   justify-content:space-between;
+  padding:7px 10px;
+  border-bottom:1px solid #30353a;
+  font-size:10px;
+  color:#777;
 }
 
-.codebar button{
-  background:none;
+.code-top button{
   border:0;
+  background:none;
   color:#19d3a2;
   cursor:pointer;
 }
 
 pre{
   margin:0;
-  padding:14px;
+  padding:13px;
   overflow:auto;
-  color:#dffdf5;
+  color:#dffbf3;
+  font-size:12px;
 }
 
-/* ACTIONS */
+/* ACTIONS ONLY ARES */
+
 .actions{
   display:flex;
-  gap:5px;
-  margin-top:8px;
+  gap:2px;
+  margin-top:7px;
 }
 
 .actions button{
-  background:none;
   border:0;
+  background:transparent;
   color:#777;
   cursor:pointer;
+  font-size:14px;
   padding:5px 7px;
 }
 
 .actions button:hover{
-  color:white;
+  color:#fff;
 }
 
 /* INPUT */
+
 .bottom{
   position:fixed;
-  bottom:0;
-  left:250px;
+  left:230px;
   right:0;
-  background:#0b0d10;
-  padding:12px 15px 18px;
+  bottom:0;
+  padding:10px 14px 15px;
+  background:linear-gradient(
+    transparent,
+    #0b0d10 25%
+  );
 }
 
 .inputbox{
-  max-width:800px;
+  max-width:780px;
   margin:auto;
   display:flex;
   align-items:flex-end;
   background:#15191e;
-  border:1px solid #353b42;
-  border-radius:12px;
-  padding:7px;
+  border:1px solid #353a40;
+  border-radius:11px;
+  padding:6px;
 }
 
 textarea{
   flex:1;
-  min-height:42px;
-  max-height:140px;
   resize:none;
+  min-height:42px;
+  max-height:130px;
   border:0;
   outline:0;
   background:none;
   color:white;
-  padding:11px;
+  padding:10px;
   font:inherit;
 }
 
-button{
-  font:inherit;
+textarea::placeholder{
+  color:#666;
 }
 
-.mic,.send{
-  width:42px;
-  height:42px;
+.mic,
+.send{
+  width:40px;
+  height:40px;
   border:0;
-  border-radius:9px;
+  border-radius:8px;
   cursor:pointer;
 }
 
@@ -254,29 +307,31 @@ button{
 }
 
 .note{
-  max-width:800px;
-  margin:6px auto 0;
   text-align:center;
-  color:#666;
-  font-size:10px;
+  color:#555;
+  font-size:9px;
+  margin-top:5px;
 }
 
-@media(max-width:700px){
+/* MOBILE */
+
+@media(max-width:600px){
 
   .sidebar{
-    width:190px;
+    width:180px;
   }
 
   .bottom{
-    left:190px;
+    left:180px;
   }
 
-  .message{
-    max-width:100%;
+  .content{
+    max-width:75vw;
   }
+
 }
 
-@media(max-width:500px){
+@media(max-width:450px){
 
   .sidebar{
     display:none;
@@ -286,11 +341,12 @@ button{
     left:0;
   }
 
-  .messages{
-    padding-left:10px;
-    padding-right:10px;
+  .content{
+    max-width:82vw;
   }
+
 }
+
 </style>
 </head>
 
@@ -304,7 +360,7 @@ button{
       <span>A</span>RES AI
     </div>
 
-    <button class="new" onclick="newChat()">
+    <button class="newchat" onclick="newChat()">
       + New chat
     </button>
 
@@ -316,11 +372,20 @@ button{
   <main class="main">
 
     <header class="header">
+
       <b>ARES AI</b>
-      <span class="online">● Online</span>
+
+      <span class="online">
+        ● Online
+      </span>
+
     </header>
 
-    <section class="messages" id="messages"></section>
+
+    <section
+      class="messages"
+      id="messages">
+    </section>
 
   </main>
 
@@ -329,7 +394,9 @@ button{
 
 <div class="bottom">
 
-  <form class="inputbox" id="form">
+  <form
+    class="inputbox"
+    id="form">
 
     <textarea
       id="input"
@@ -339,18 +406,20 @@ button{
     <button
       type="button"
       class="mic"
-      onclick="voice()"
-    >🎙</button>
+      onclick="voice()">
+      🎙
+    </button>
 
     <button
       type="submit"
-      class="send"
-    >➤</button>
+      class="send">
+      ➤
+    </button>
 
   </form>
 
   <div class="note">
-    ARES AI can make mistakes. Verify important security information.
+    ARES AI can make mistakes. Verify important information.
   </div>
 
 </div>
@@ -358,340 +427,614 @@ button{
 
 <script>
 
-let chats=[];
-let current=[];
+/* =========================
+   DATA
+========================= */
 
-const messages=document.getElementById("messages");
-const input=document.getElementById("input");
-const form=document.getElementById("form");
-const history=document.getElementById("history");
+let currentChat = [];
+
+let savedChats = [];
 
 
-/* START */
-function start(){
+/* =========================
+   ELEMENTS
+========================= */
 
-  if(current.length===0){
+const messages =
+  document.getElementById("messages");
 
-    addMessage(
-      "assistant",
-      "Hello! Main ARES AI hoon.\n\nTum mujhse cybersecurity, Linux, networking, web security, programming aur security concepts ke baare mein pooch sakte ho.\n\nExample:\n\n\"Explain DNS\"\n\"Linux security commands do\"\n\"What is an HTTP request?\""
-    );
+const input =
+  document.getElementById("input");
 
-  }
+const form =
+  document.getElementById("form");
+
+const history =
+  document.getElementById("history");
+
+
+/* =========================
+   START
+========================= */
+
+showWelcome();
+
+
+function showWelcome(){
+
+  messages.innerHTML="";
+
+  addMessage(
+    "assistant",
+`Hello! 👋
+
+Main ARES AI hoon.
+
+Tum mujhse cybersecurity, Linux, networking, web security, programming aur security concepts ke baare mein pooch sakte ho.
+
+Example:
+
+"Explain DNS"
+"Linux commands explain karo"
+"TCP handshake kya hai?"
+"HTTP request explain karo"`
+  );
 
 }
 
 
-/* SEND */
-form.addEventListener("submit",function(e){
+/* =========================
+   SEND MESSAGE
+========================= */
 
-  e.preventDefault();
+form.addEventListener(
+  "submit",
+  function(e){
 
-  const text=input.value.trim();
+    e.preventDefault();
 
-  if(!text)return;
+    const question =
+      input.value.trim();
 
-  input.value="";
+    if(!question){
+      return;
+    }
 
-  addMessage("user",text);
+    input.value="";
 
-  setTimeout(function(){
-
-    const answer=getAnswer(text);
-
-    addMessage("assistant",answer);
-
-  },500);
-
-});
+    addMessage(
+      "user",
+      question
+    );
 
 
-/* ADD MESSAGE */
-function addMessage(role,text){
+    setTimeout(
+      function(){
 
-  current.push({
+        const answer =
+          getAnswer(question);
+
+        addMessage(
+          "assistant",
+          answer
+        );
+
+      },
+      400
+    );
+
+  }
+);
+
+
+/* =========================
+   ADD MESSAGE
+========================= */
+
+function addMessage(
+  role,
+  text
+){
+
+  currentChat.push({
     role:role,
     text:text
   });
 
-  const box=document.createElement("div");
 
-  box.className="message "+role;
+  const message =
+    document.createElement("div");
 
-  const avatar=document.createElement("div");
+  message.className =
+    "message " + role;
+
+
+  const inner =
+    document.createElement("div");
+
+  inner.className =
+    "message-inner";
+
+
+  const avatar =
+    document.createElement("div");
 
   avatar.className="avatar";
 
-  avatar.textContent=
-    role==="user" ? "U" : "A";
+  avatar.textContent =
+    role==="user"
+    ? "U"
+    : "A";
 
-  const content=document.createElement("div");
+
+  const content =
+    document.createElement("div");
 
   content.className="content";
 
-  const name=document.createElement("div");
+
+  const name =
+    document.createElement("div");
 
   name.className="name";
 
-  name.textContent=
-    role==="user" ? "You" : "ARES AI";
+  name.textContent =
+    role==="user"
+    ? "You"
+    : "ARES AI";
 
-  const messageText=document.createElement("div");
 
-  messageText.className="text";
+  const textBox =
+    document.createElement("div");
 
-  messageText.innerHTML=format(text);
+  textBox.className="text";
+
+  textBox.innerHTML =
+    formatText(text);
+
 
   content.appendChild(name);
-  content.appendChild(messageText);
 
+  content.appendChild(textBox);
+
+
+  /* ACTIONS ONLY FOR ARES */
 
   if(role==="assistant"){
 
-    const actions=document.createElement("div");
+    const actions =
+      document.createElement("div");
 
     actions.className="actions";
 
+
     actions.innerHTML=`
-      <button onclick="copyAnswer(this)">⧉</button>
-      <button onclick="like(this)">♡</button>
-      <button onclick="speak(this)">🔊</button>
-      <button onclick="share(this)">↗</button>
+
+      <button
+        onclick="copyMessage(this)"
+        title="Copy">
+        ⧉
+      </button>
+
+      <button
+        onclick="likeMessage(this)"
+        title="Like">
+        ♡
+      </button>
+
+      <button
+        onclick="dislikeMessage(this)"
+        title="Dislike">
+        👎
+      </button>
+
+      <button
+        onclick="readMessage(this)"
+        title="Read aloud">
+        🔊
+      </button>
+
+      <button
+        onclick="shareMessage(this)"
+        title="Share">
+        ↗
+      </button>
+
     `;
+
 
     content.appendChild(actions);
 
   }
 
 
-  box.appendChild(avatar);
-  box.appendChild(content);
+  inner.appendChild(avatar);
 
-  messages.appendChild(box);
+  inner.appendChild(content);
 
-  messages.scrollTop=messages.scrollHeight;
+  message.appendChild(inner);
+
+  messages.appendChild(message);
+
+
+  messages.scrollTop =
+    messages.scrollHeight;
 
 }
 
 
-/* FORMAT TEXT + CODE */
-function format(text){
+/* =========================
+   FORMAT
+========================= */
 
-  let safe=text
+function formatText(text){
+
+  let safe =
+    text
     .replace(/&/g,"&amp;")
     .replace(/</g,"&lt;")
     .replace(/>/g,"&gt;");
 
-  safe=safe.replace(
-    /```([\s\S]*?)```/g,
-    function(match,code){
 
-      return `
-      <div class="code">
+  safe =
+    safe.replace(
+      /```([\s\S]*?)```/g,
+      function(_,code){
 
-        <div class="codebar">
-          <span>COMMAND</span>
-          <button onclick="copyCode(this)">
-            Copy
-          </button>
+        return `
+
+        <div class="code">
+
+          <div class="code-top">
+
+            <span>CODE</span>
+
+            <button
+              onclick="copyCode(this)">
+              Copy
+            </button>
+
+          </div>
+
+          <pre>${code.trim()}</pre>
+
         </div>
 
-        <pre>${code.trim()}</pre>
+        `;
 
-      </div>
-      `;
+      }
+    );
 
-    }
-  );
 
   return safe;
 
 }
 
 
-/* COPY ANSWER */
-function copyAnswer(button){
+/* =========================
+   COPY
+========================= */
 
-  const text=
+async function copyMessage(button){
+
+  const text =
     button
     .closest(".content")
     .querySelector(".text")
     .innerText;
 
-  navigator.clipboard.writeText(text);
+
+  try{
+
+    await navigator.clipboard.writeText(text);
+
+    button.textContent="✓";
+
+    setTimeout(
+      ()=>button.textContent="⧉",
+      1000
+    );
+
+  }catch{
+
+    alert("Copy permission unavailable.");
+
+  }
 
 }
 
 
-/* COPY CODE */
-function copyCode(button){
+async function copyCode(button){
 
-  const code=
+  const code =
     button
     .closest(".code")
     .querySelector("pre")
     .innerText;
 
-  navigator.clipboard.writeText(code);
 
-  button.innerText="Copied";
+  try{
 
-  setTimeout(()=>{
-    button.innerText="Copy";
-  },1000);
+    await navigator.clipboard.writeText(code);
+
+    button.textContent="Copied";
+
+    setTimeout(
+      ()=>button.textContent="Copy",
+      1000
+    );
+
+  }catch{
+
+    alert("Copy failed.");
+
+  }
 
 }
 
 
-/* LIKE */
-function like(button){
+/* =========================
+   LIKE / DISLIKE
+========================= */
 
-  button.style.color=
-    button.style.color==="rgb(25, 211, 162)"
-    ? "#777"
-    : "#19d3a2";
+function likeMessage(button){
+
+  button.style.color =
+    "#19d3a2";
 
 }
 
 
-/* SPEAK */
-function speak(button){
+function dislikeMessage(button){
 
-  const text=
+  button.style.color =
+    "#ff7777";
+
+}
+
+
+/* =========================
+   READ ALOUD
+========================= */
+
+function readMessage(button){
+
+  const text =
     button
     .closest(".content")
     .querySelector(".text")
     .innerText;
 
+
+  if(!("speechSynthesis" in window)){
+
+    alert(
+      "Text-to-speech is not supported."
+    );
+
+    return;
+
+  }
+
+
   speechSynthesis.cancel();
 
-  const speech=
+
+  const speech =
     new SpeechSynthesisUtterance(text);
 
+
   speech.rate=1;
+
+  speech.pitch=1;
+
 
   speechSynthesis.speak(speech);
 
 }
 
 
-/* SHARE */
-async function share(button){
+/* =========================
+   SHARE
+========================= */
 
-  const text=
+async function shareMessage(button){
+
+  const text =
     button
     .closest(".content")
     .querySelector(".text")
     .innerText;
 
+
   if(navigator.share){
 
-    await navigator.share({
-      title:"ARES AI",
-      text:text
-    });
+    try{
+
+      await navigator.share({
+
+        title:"ARES AI",
+
+        text:text,
+
+        url:location.href
+
+      });
+
+    }catch(e){
+
+      /* User cancelled */
+
+    }
 
   }else{
 
-    navigator.clipboard.writeText(text);
+    try{
 
-    alert("Answer copied.");
+      await navigator.clipboard.writeText(text);
+
+      alert(
+        "Sharing unavailable. Answer copied."
+      );
+
+    }catch{
+
+      alert(
+        "Sharing is not supported here."
+      );
+
+    }
 
   }
 
 }
 
 
-/* NEW CHAT */
+/* =========================
+   NEW CHAT
+========================= */
+
 function newChat(){
 
-  if(current.length>0){
+  if(currentChat.length){
 
-    chats.push([...current]);
+    savedChats.push(
+      [...currentChat]
+    );
+
+    updateHistory();
 
   }
 
-  current=[];
+
+  currentChat=[];
 
   messages.innerHTML="";
 
-  start();
-
-  updateHistory();
+  showWelcome();
 
 }
 
 
-/* HISTORY */
+/* =========================
+   HISTORY
+========================= */
+
 function updateHistory(){
 
   history.innerHTML="";
 
-  chats.forEach((chat,i)=>{
 
-    const item=document.createElement("div");
+  savedChats.forEach(
+    function(chat,index){
 
-    item.textContent=
-      "Chat "+(i+1);
+      const item =
+        document.createElement("div");
 
-    item.onclick=function(){
 
-      current=chat;
+      item.className =
+        "history-item";
 
-      messages.innerHTML="";
 
-      current.forEach(msg=>{
-        addMessage(msg.role,msg.text);
-      });
+      const firstUser =
+        chat.find(
+          m=>m.role==="user"
+        );
 
-    };
 
-    history.appendChild(item);
+      item.textContent =
+        firstUser
+        ? firstUser.text.substring(0,25)
+        : "Chat " + (index+1);
 
-  });
+
+      item.onclick=function(){
+
+        currentChat =
+          [...chat];
+
+
+        messages.innerHTML="";
+
+
+        chat.forEach(
+          m=>{
+
+            addMessage(
+              m.role,
+              m.text
+            );
+
+          }
+        );
+
+      };
+
+
+      history.appendChild(item);
+
+    }
+  );
 
 }
 
 
-/* VOICE */
+/* =========================
+   VOICE INPUT
+========================= */
+
 function voice(){
 
-  const SpeechRecognition=
+  const Recognition =
     window.SpeechRecognition ||
     window.webkitSpeechRecognition;
 
-  if(!SpeechRecognition){
 
-    alert("Voice input is not supported.");
+  if(!Recognition){
+
+    alert(
+      "Voice input is not supported."
+    );
 
     return;
 
   }
 
-  const recognition=
-    new SpeechRecognition();
+
+  const recognition =
+    new Recognition();
+
 
   recognition.lang="en-IN";
 
+
   recognition.start();
 
-  recognition.onresult=function(event){
 
-    input.value=
-      event.results[0][0].transcript;
+  recognition.onresult =
+    function(event){
 
-  };
+      input.value =
+        event.results[0][0]
+        .transcript;
+
+    };
 
 }
 
 
-/* BASIC AI ANSWERS */
+/* =========================
+   ARES RESPONSE ENGINE
+========================= */
+
 function getAnswer(question){
 
-  const q=question.toLowerCase();
+  const q =
+    question.toLowerCase();
 
 
   /* HELLO */
+
   if(
     q==="hi" ||
     q==="hello" ||
@@ -702,26 +1045,22 @@ function getAnswer(question){
 
 Main ARES AI hoon.
 
-Tum mujhse cybersecurity, Linux, networking, web security aur programming ke questions pooch sakte ho.
+Tum apna question directly pooch sakte ho aur main available knowledge ke basis par answer dunga.
 
-Example:
-
-"Explain DNS"
-"Linux ke useful commands do"
-"TCP handshake explain karo"
-"HTTP kya hota hai?"`;
+Cybersecurity learning, Linux, networking, HTTP, DNS aur programming jaise topics mein help kar sakta hoon.`;
 
   }
 
 
   /* DNS */
+
   if(q.includes("dns")){
 
-    return `DNS ka matlab Domain Name System hai.
+    return `DNS ka full form Domain Name System hai.
 
-Iska main kaam domain name ko IP address mein resolve karna hota hai.
+DNS domain name ko IP address se resolve karta hai.
 
-Example:
+Basic example:
 
 \`\`\`bash
 nslookup example.com
@@ -735,18 +1074,16 @@ dig example.com
 
 Simple flow:
 
-Browser → DNS resolver → DNS server → IP address → Website`;
+Domain → DNS Resolver → DNS Server → IP Address`;
 
   }
 
 
   /* LINUX */
-  if(
-    q.includes("linux") ||
-    q.includes("linux command")
-  ){
 
-    return `Linux ke kuch basic security/system commands:
+  if(q.includes("linux")){
+
+    return `Linux ke basic system/security commands:
 
 \`\`\`bash
 whoami
@@ -761,21 +1098,22 @@ df -h
 free -h
 \`\`\`
 
-Ye commands apne device ya authorized lab par system/network information samajhne ke liye useful hain.`;
+Inhe apne device ya authorized lab mein system information samajhne ke liye use karo.`;
 
   }
 
 
   /* NETWORK */
+
   if(
     q.includes("network") ||
     q.includes("networking")
   ){
 
-    return `Networking learning ke basic topics:
+    return `Networking ke important basics:
 
-1. IP address
-2. MAC address
+1. IP Address
+2. MAC Address
 3. Subnet
 4. Gateway
 5. DNS
@@ -785,28 +1123,44 @@ Ye commands apne device ya authorized lab par system/network information samajhn
 9. Routing
 10. Firewall
 
-Useful commands:
+Basic diagnostic commands:
 
 \`\`\`bash
 ip addr
 ip route
 ping example.com
-ss -tulpn
 nslookup example.com
+ss -tulpn
 \`\`\``;
 
   }
 
 
+  /* TCP */
+
+  if(q.includes("tcp")){
+
+    return `TCP connection establish karne ke liye three-way handshake use karta hai:
+
+1. SYN
+2. SYN-ACK
+3. ACK
+
+Iske baad TCP connection ke through data transfer hota hai.`;
+
+  }
+
+
   /* HTTP */
+
   if(
     q.includes("http") ||
     q.includes("https")
   ){
 
-    return `HTTP web communication ka protocol hai.
+    return `HTTP web communication protocol hai.
 
-Common methods:
+Common HTTP methods:
 
 GET
 POST
@@ -821,77 +1175,70 @@ GET / HTTP/1.1
 Host: example.com
 \`\`\`
 
-HTTP request mein method, URL/path, headers aur kabhi request body hoti hai.`;
+Request mein method, path, headers aur kabhi body hoti hai.`;
 
   }
 
 
-  /* TCP */
-  if(q.includes("tcp")){
+  /* NMAP / SCANNING */
 
-    return `TCP ek connection-oriented transport protocol hai.
-
-Basic TCP connection mein commonly:
-
-1. SYN
-2. SYN-ACK
-3. ACK
-
-Is process ko TCP three-way handshake kehte hain.`;
-
-  }
-
-
-  /* IP */
   if(
-    q.includes("ip address") ||
-    q==="ip"
+    q.includes("nmap") ||
+    q.includes("port scan") ||
+    q.includes("ports")
   ){
 
-    return `IP address network par kisi device/interface ko identify karne ke liye use hota hai.
+    return `Nmap network discovery aur port-analysis tool hai.
 
-Local IP dekhne ke liye:
+Main unauthorized systems ko scan karne ke instructions nahi dunga.
+
+Agar tum apne authorized lab/device ka scan kar rahe ho, to scan ka output yahan paste karo. Main usmein:
+
+• Open/closed ports
+• Services
+• Protocols
+• Possible configuration issues
+
+ko explain kar sakta hoon.
+
+Basic local information ke liye:
 
 \`\`\`bash
 ip addr
-\`\`\`
-
-Routing table dekhne ke liye:
-
-\`\`\`bash
-ip route
+ss -tulpn
 \`\`\``;
 
   }
 
 
   /* PASSWORD */
+
   if(q.includes("password")){
 
     return `Strong password ke liye:
 
-• Long password/passphrase use karo
-• Har account ke liye unique password
-• Password manager use kar sakte ho
+• Long passphrase use karo
+• Har account ke liye unique password rakho
 • 2FA/MFA enable karo
-• Password kisi ke saath share mat karo`;
+• Password share mat karo
+• Password manager use kar sakte ho`;
 
   }
 
 
   /* DEFAULT */
-  return `Maine tumhara message receive kiya:
+
+  return `Samajh gaya.
+
+Tumne poocha:
 
 "${question}"
 
-Is basic version mein common cybersecurity, Linux, networking aur programming questions ke built-in answers hain.
+Is version mein main common cybersecurity, Linux, networking, HTTP, DNS aur programming concepts par built-in answers de sakta hoon.
 
-Agar tum chahte ho ki ARES AI **literally kisi bhi normal question ka dynamic answer** de, to next step mein humein is website ko ek real AI backend/API se connect karna hoga. API key ko directly HTML mein rakhna safe nahi hota.`;
+Agar kisi authorized lab/security exercise ka output hai, woh yahan paste karo aur main uska meaning explain kar dunga.`;
 
 }
-
-
-start();
 
 </script>
 
