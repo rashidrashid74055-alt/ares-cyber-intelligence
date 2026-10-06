@@ -1,158 +1,80 @@
-export default {
-  async fetch(request) {
-    const corsHeaders = {
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "POST, OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type",
-      "Content-Type": "application/json"
-    };
+export default async function handler(req, res) {
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method not allowed" });
+  }
 
-    if (request.method === "OPTIONS") {
-      return new Response(null, {
-        status: 204,
-        headers: corsHeaders
+  try {
+    const { message } = req.body || {};
+
+    if (!message || typeof message !== "string") {
+      return res.status(400).json({ error: "Message is required" });
+    }
+
+    const apiKey = process.env.LITEROUTER_API_KEY;
+
+    if (!apiKey) {
+      return res.status(500).json({
+        error: "LITEROUTER_API_KEY is missing in Vercel."
       });
     }
 
-    if (request.method !== "POST") {
-      return new Response(
-        JSON.stringify({ error: "Only POST requests are allowed." }),
-        { status: 405, headers: corsHeaders }
-      );
-    }
-
-    try {
-      const body = await request.json();
-      const message = body?.message;
-
-      if (!message || typeof message !== "string") {
-        return new Response(
-          JSON.stringify({ error: "Message is required." }),
-          { status: 400, headers: corsHeaders }
-        );
-      }
-
-      const apiKey = process.env.GEMINI_API_KEY;
-
-      if (!apiKey) {
-        return new Response(
-          JSON.stringify({ error: "GEMINI_API_KEY is missing." }),
-          { status: 500, headers: corsHeaders }
-        );
-      }
-
-      const systemInstruction =
-        "You are ARES AI, a fast helpful general-purpose assistant. " +
-        "Answer directly and concisely unless the user asks for detail. " +
-        "For cybersecurity, help with authorized testing, defensive security, " +
-        "education, troubleshooting and safe labs. Do not facilitate malware, " +
-        "credential theft, unauthorized access, evasion or destructive attacks.";
-
-      const maxAttempts = 3;
-      let lastError = "Temporary Gemini service error.";
-
-      for (let attempt = 0; attempt < maxAttempts; attempt++) {
-        try {
-          const response = await fetch(
-            "https://generativelanguage.googleapis.com/v1beta/interactions",
+    const response = await fetch(
+      "https://api.literouter.com/v1/chat/completions",
+      {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${apiKey}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          model: "deepseek-v4-flash-0731:free",
+          messages: [
             {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                "x-goog-api-key": apiKey
-              },
-              body: JSON.stringify({
-                model: "gemini-3.8-flash",
-                input: message,
-                system_instruction: systemInstruction,
-                generation_config: {
-                  thinking_level: "low",
-                  temperature: 0.3
-                }
-              })
+              role: "system",
+              content:
+                "You are ARES AI, a helpful general-purpose AI assistant. Give clear, useful answers. For cybersecurity, focus on authorized testing, defensive security, education, Linux, networking, and safe labs."
+            },
+            {
+              role: "user",
+              content: message
             }
-          );
-
-          const data = await response.json();
-
-          if (response.ok) {
-            const reply =
-              data?.output_text ||
-              data?.steps
-                ?.filter(s => s.type === "model_output")
-                ?.flatMap(s => s.content || [])
-                ?.filter(c => typeof c.text === "string")
-                ?.map(c => c.text)
-                ?.join("\n")
-                ?.trim();
-
-            if (reply) {
-              return new Response(
-                JSON.stringify({ reply }),
-                {
-                  status: 200,
-                  headers: corsHeaders
-                }
-              );
-            }
-
-            lastError = "Gemini returned an empty response.";
-            break;
-          }
-
-          lastError =
-            data?.error?.message ||
-            `Gemini HTTP ${response.status}`;
-
-          // Retry only temporary errors.
-          const retryable =
-            response.status === 408 ||
-            response.status === 429 ||
-            response.status === 500 ||
-            response.status === 502 ||
-            response.status === 503 ||
-            response.status === 504;
-
-          if (!retryable) break;
-
-          // Short exponential backoff: 0.8s, 1.6s, 3.2s
-          if (attempt < maxAttempts - 1) {
-            await new Promise(resolve =>
-              setTimeout(resolve, 800 * Math.pow(2, attempt))
-            );
-          }
-        } catch (err) {
-          lastError = err?.message || "Network error.";
-
-          if (attempt < maxAttempts - 1) {
-            await new Promise(resolve =>
-              setTimeout(resolve, 800 * Math.pow(2, attempt))
-            );
-          }
-        }
+          ],
+          temperature: 0.7,
+          max_tokens: 2048
+        })
       }
+    );
 
-      return new Response(
-        JSON.stringify({
-          error:
-            "ARES temporarily unavailable. Please try again in a moment."
-        }),
-        {
-          status: 503,
-          headers: corsHeaders
-        }
-      );
+    const data = await response.json();
 
-    } catch (error) {
-      return new Response(
-        JSON.stringify({
-          error: "ARES server error."
-        }),
-        {
-          status: 500,
-          headers: corsHeaders
-        }
-      );
+    if (!response.ok) {
+      console.error("LiteRouter error:", data);
+
+      return res.status(response.status).json({
+        error:
+          data?.error?.message ||
+          data?.message ||
+          "LiteRouter request failed."
+      });
     }
+
+    const reply = data?.choices?.[0]?.message?.content;
+
+    if (!reply) {
+      console.error("Unexpected LiteRouter response:", data);
+
+      return res.status(502).json({
+        error: "LiteRouter returned no text response."
+      });
+    }
+
+    return res.status(200).json({ reply });
+
+  } catch (error) {
+    console.error("ARES backend error:", error);
+
+    return res.status(500).json({
+      error: "ARES backend temporarily unavailable."
+    });
   }
-};
+}
