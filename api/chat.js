@@ -1,12 +1,19 @@
 export default async function handler(req, res) {
 
-  // ================================
-  // CORS
-  // ================================
+  res.setHeader(
+    "Access-Control-Allow-Origin",
+    "*"
+  );
 
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "POST, OPTIONS"
+  );
+
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "Content-Type"
+  );
 
   if (req.method === "OPTIONS") {
     return res.status(204).end();
@@ -20,223 +27,262 @@ export default async function handler(req, res) {
 
   try {
 
-    const body = req.body || {};
+    const body =
+      req.body || {};
 
-    const message = body.message;
-    const history = Array.isArray(body.history)
-      ? body.history
-      : [];
+    const message =
+      typeof body.message === "string"
+        ? body.message.trim()
+        : "";
 
-    if (!message || typeof message !== "string") {
+    const incomingMessages =
+      Array.isArray(body.messages)
+        ? body.messages
+        : [];
+
+    if (!message) {
       return res.status(400).json({
         error: "Message is required"
       });
     }
-
-    // ================================
-    // API KEY
-    // ================================
 
     const apiKey =
       process.env.LITEROUTER_API_KEY;
 
     if (!apiKey) {
       return res.status(500).json({
-        error: "LITEROUTER_API_KEY is missing in Vercel."
+        error:
+          "LITEROUTER_API_KEY is missing in Vercel."
       });
     }
 
-    // ================================
-    // ARES SYSTEM PROMPT
-    // ================================
+
+    /* =====================================================
+       ARES SYSTEM PROMPT
+    ===================================================== */
 
     const systemPrompt = `
 You are ARES AI, an advanced general-purpose AI assistant.
 
-Your job is to provide clear, practical, technically accurate answers.
+Your main areas of expertise include:
 
-GENERAL CAPABILITIES:
-- General knowledge
-- Programming
-- HTML, CSS, JavaScript
-- Websites and web development
-- GitHub and deployment
+- General knowledge and explanations
 - Linux and Termux
 - Android troubleshooting
 - Networking and TCP/IP
-- DNS, HTTP, HTTPS
-- Databases
-- Cloud and APIs
+- DNS, HTTP, HTTPS and web technologies
+- Programming and debugging
+- HTML, CSS, JavaScript and websites
+- GitHub and deployment
+- Cloud and backend troubleshooting
 - Cybersecurity education
-- Defensive security
-- Security labs and CTF learning
-
-CYBERSECURITY:
-You should understand and explain security concepts including:
-- Nmap
-- Wireshark
-- Burp Suite
-- Metasploit
-- OWASP concepts
-- Web vulnerabilities
-- Authentication and authorization
-- SQL injection concepts
-- XSS concepts
-- SSRF concepts
-- CSRF concepts
-- Network security
-- Malware concepts
-- RAT concepts
-- DDoS concepts
-- Phishing concepts
-- Reverse engineering concepts
-- Linux security
-- Android security
-- Incident response
+- Security architecture
+- Vulnerability concepts
+- Secure coding
 - Threat modeling
-- Vulnerability assessment
+- Malware/RAT/DDoS concepts and defensive analysis
+- Nmap and network troubleshooting
+- CTFs and legal security labs
+- Blue-team and defensive security
 
-When the user asks to learn cybersecurity practically, prefer:
-- Their own device
-- Their own server
-- Local virtual machines
-- CTFs
-- Intentionally vulnerable applications
-- Security labs
-- Authorized penetration-testing environments
+Answer clearly and practically.
 
-For commands:
-- Put commands inside fenced code blocks using triple backticks.
-- Always explain briefly what the command does.
-- If useful, provide prerequisites and expected output.
-- Never invent command output.
-- Prefer commands that are appropriate for the stated environment.
+When the user asks for commands:
+1. Give the exact command in a proper fenced code block.
+2. Explain briefly what the command does.
+3. Explain important options/flags.
+4. If multiple commands are needed, put them in separate code blocks or one clearly labeled block.
+5. Prefer copy-paste-ready commands.
+6. Never put fake placeholder commands where an exact safe command can be given.
 
-For dangerous cybersecurity requests:
-- Explain the concept and defensive side.
-- Provide safe lab/CTF alternatives.
-- Do not provide instructions for harming real systems, stealing credentials, deploying malware against others, bypassing security, or disrupting real networks.
+For cybersecurity:
+- Teach concepts deeply.
+- Explain tools, vulnerabilities, malware, RATs, DDoS and offensive-security concepts at an educational level.
+- For practical security testing, assume an authorized lab, CTF, local VM, emulator, or system the user owns/has explicit permission to test.
+- For potentially harmful activity, keep instructions limited to safe, authorized environments and defensive learning.
+- Do not provide instructions for compromising real third-party systems, credential theft, malware deployment, persistence, evasion, destructive attacks, or unauthorized access.
+- When a requested technique is dangerous outside a lab, provide a safe lab equivalent instead.
 
-RESPONSE STYLE:
-- Be practical.
-- Do not unnecessarily repeat the user's question.
-- Use headings when useful.
-- Keep simple questions concise.
-- For technical tasks, give exact steps.
-- If commands are needed, provide copyable code blocks.
-- If the user is troubleshooting an error, diagnose the error first.
-- Remember the conversation context supplied to you.
+For commands, use Markdown fenced code blocks such as:
+
+\`\`\`bash
+command here
+\`\`\`
+
+Do not unnecessarily repeat the user's question.
+
+Be concise when the question is simple and detailed when the user asks for a tutorial.
+
+Maintain context from the conversation messages supplied by the application.
+
+If the user asks for a legal vulnerability-testing workflow, structure it as:
+1. Scope
+2. Reconnaissance
+3. Enumeration
+4. Validation
+5. Risk explanation
+6. Remediation
+7. Safe lab practice
+
+You are ARES AI. Be technically useful, accurate, and practical.
 `;
 
-    // ================================
-    // BUILD CONVERSATION
-    // ================================
 
-    const cleanedHistory = history
-      .filter(item =>
-        item &&
-        (item.role === "user" || item.role === "assistant") &&
-        typeof item.content === "string"
-      )
-      .slice(-12);
+    /* =====================================================
+       BUILD CONTEXT
+    ===================================================== */
+
+    const cleanedHistory =
+      incomingMessages
+        .filter(
+          m =>
+            m &&
+            (
+              m.role === "user" ||
+              m.role === "assistant"
+            ) &&
+            typeof m.content === "string"
+        )
+        .slice(-20);
+
 
     const messages = [
       {
-        role: "system",
-        content: systemPrompt
+        role:"system",
+        content:systemPrompt
       },
-      ...cleanedHistory,
-      {
-        role: "user",
-        content: message
-      }
+      ...cleanedHistory
     ];
 
-    // ================================
-    // LITEROUTER
-    // ================================
 
-    const response = await fetch(
-      "https://api.literouter.com/v1/chat/completions",
-      {
-        method: "POST",
+    /*
+      Safety against malformed client history:
+      always make sure the latest message exists.
+    */
 
-        headers: {
-          "Authorization": `Bearer ${apiKey}`,
-          "Content-Type": "application/json"
-        },
+    if(
+      !messages.some(
+        m =>
+          m.role === "user" &&
+          m.content === message
+      )
+    ){
 
-        body: JSON.stringify({
+      messages.push({
+        role:"user",
+        content:message
+      });
 
-          model: "glm-5.3-flash:free",
+    }
 
-          messages,
 
-          temperature: 0.55,
+    /* =====================================================
+       LITEROUTER
+    ===================================================== */
 
-          // Smaller response = generally faster
-          max_tokens: 1400
-        })
-      }
-    );
+    const response =
+      await fetch(
+        "https://api.literouter.com/v1/chat/completions",
+        {
+          method:"POST",
 
-    const raw = await response.text();
+          headers:{
+            "Authorization":
+              `Bearer ${apiKey}`,
+
+            "Content-Type":
+              "application/json"
+          },
+
+          body:JSON.stringify({
+
+            model:
+              "glm-5.3-flash:free",
+
+            messages,
+
+            temperature:
+              0.65,
+
+            max_tokens:
+              2048
+
+          })
+        }
+      );
+
+
+    const raw =
+      await response.text();
 
     let data = {};
 
     try {
-      data = raw
-        ? JSON.parse(raw)
-        : {};
+
+      data =
+        raw
+          ? JSON.parse(raw)
+          : {};
+
     } catch {
+
       data = {};
+
     }
 
-    // ================================
-    // LITEROUTER ERROR
-    // ================================
 
-    if (!response.ok) {
+    if(!response.ok){
 
       console.error(
-        "LiteRouter error:",
+        "LiteRouter HTTP error:",
         response.status,
         raw
       );
 
-      return res.status(response.status).json({
+      return res.status(
+        response.status
+      ).json({
+
         error:
           data?.error?.message ||
           data?.error?.code ||
           raw ||
           `LiteRouter HTTP ${response.status}`
+
       });
+
     }
 
-    // ================================
-    // RESPONSE
-    // ================================
 
     const reply =
-      data?.choices?.[0]?.message?.content;
+      data
+        ?.choices
+        ?.[0]
+        ?.message
+        ?.content;
 
-    if (!reply) {
+
+    if(!reply){
 
       console.error(
-        "Empty LiteRouter response:",
+        "LiteRouter empty response:",
         raw
       );
 
       return res.status(502).json({
-        error: "LiteRouter returned an empty response."
+        error:
+          "LiteRouter returned no AI response."
       });
+
     }
+
 
     return res.status(200).json({
       reply
     });
 
-  } catch (error) {
+
+  } catch(error){
 
     console.error(
       "ARES backend error:",
@@ -248,5 +294,7 @@ RESPONSE STYLE:
         error?.message ||
         "Backend request failed."
     });
+
   }
+
 }
