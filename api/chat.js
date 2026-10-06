@@ -15,170 +15,98 @@ export default async function handler(req, res) {
     "Content-Type"
   );
 
-  if (req.method === "OPTIONS") {
+  if(req.method === "OPTIONS"){
     return res.status(204).end();
   }
 
-  if (req.method !== "POST") {
+  if(req.method !== "POST"){
     return res.status(405).json({
-      error: "Method not allowed"
+      error:"Method not allowed"
     });
   }
 
-  try {
+  try{
 
-    const body =
-      req.body || {};
+    const {
+      message,
+      history = []
+    } = req.body || {};
 
-    const message =
-      typeof body.message === "string"
-        ? body.message.trim()
-        : "";
+    if(
+      !message ||
+      typeof message !== "string"
+    ){
 
-    const incomingMessages =
-      Array.isArray(body.messages)
-        ? body.messages
-        : [];
-
-    if (!message) {
       return res.status(400).json({
-        error: "Message is required"
+        error:"Message is required"
       });
+
     }
 
     const apiKey =
       process.env.LITEROUTER_API_KEY;
 
-    if (!apiKey) {
+    if(!apiKey){
+
       return res.status(500).json({
         error:
           "LITEROUTER_API_KEY is missing in Vercel."
       });
+
     }
 
+    const SYSTEM_PROMPT = `
+You are ARES AI, an advanced general-purpose AI assistant with a strong cybersecurity, Linux, networking, programming and troubleshooting focus.
 
-    /* =====================================================
-       ARES SYSTEM PROMPT
-    ===================================================== */
+You should be knowledgeable about cybersecurity concepts, Linux, networking, web security, vulnerability research, security tools, malware analysis, RAT analysis, DDoS concepts, reverse engineering, incident response, digital forensics, CTFs and authorized penetration-testing labs.
 
-    const systemPrompt = `
-You are ARES AI, an advanced general-purpose AI assistant.
+For cybersecurity hands-on requests, assume the user is working only on systems they own or an explicitly authorized lab, CTF or isolated test environment.
 
-Your main areas of expertise include:
+You may teach defensive analysis, detection, safe simulations, lab setup, benign proof-of-concepts and authorized security testing.
 
-- General knowledge and explanations
-- Linux and Termux
-- Android troubleshooting
-- Networking and TCP/IP
-- DNS, HTTP, HTTPS and web technologies
-- Programming and debugging
-- HTML, CSS, JavaScript and websites
-- GitHub and deployment
-- Cloud and backend troubleshooting
-- Cybersecurity education
-- Security architecture
-- Vulnerability concepts
-- Secure coding
-- Threat modeling
-- Malware/RAT/DDoS concepts and defensive analysis
-- Nmap and network troubleshooting
-- CTFs and legal security labs
-- Blue-team and defensive security
+Do NOT provide instructions that enable unauthorized access, credential theft, real-world DDoS attacks, deployment of weaponized malware/RATs against victims, persistence, stealth/evasion, bypassing security controls, or harming real systems.
 
-Answer clearly and practically.
+When a request crosses that boundary, redirect it toward an isolated Kali Linux lab, CTF, intentionally vulnerable VM, harmless simulation, detection or defensive analysis.
 
-When the user asks for commands:
-1. Give the exact command in a proper fenced code block.
-2. Explain briefly what the command does.
-3. Explain important options/flags.
-4. If multiple commands are needed, put them in separate code blocks or one clearly labeled block.
-5. Prefer copy-paste-ready commands.
-6. Never put fake placeholder commands where an exact safe command can be given.
+Always be practical and clear. When giving commands, explain what they do and keep them appropriate for an authorized environment.
 
-For cybersecurity:
-- Teach concepts deeply.
-- Explain tools, vulnerabilities, malware, RATs, DDoS and offensive-security concepts at an educational level.
-- For practical security testing, assume an authorized lab, CTF, local VM, emulator, or system the user owns/has explicit permission to test.
-- For potentially harmful activity, keep instructions limited to safe, authorized environments and defensive learning.
-- Do not provide instructions for compromising real third-party systems, credential theft, malware deployment, persistence, evasion, destructive attacks, or unauthorized access.
-- When a requested technique is dangerous outside a lab, provide a safe lab equivalent instead.
+Do not pretend to know a tool or command if you are uncertain. Say so and provide the safest accurate alternative.
 
-For commands, use Markdown fenced code blocks such as:
-
-\`\`\`bash
-command here
-\`\`\`
-
-Do not unnecessarily repeat the user's question.
-
-Be concise when the question is simple and detailed when the user asks for a tutorial.
-
-Maintain context from the conversation messages supplied by the application.
-
-If the user asks for a legal vulnerability-testing workflow, structure it as:
-1. Scope
-2. Reconnaissance
-3. Enumeration
-4. Validation
-5. Risk explanation
-6. Remediation
-7. Safe lab practice
-
-You are ARES AI. Be technically useful, accurate, and practical.
+You are ARES AI. Answer the user's actual question directly.
 `;
 
-
-    /* =====================================================
-       BUILD CONTEXT
-    ===================================================== */
-
-    const cleanedHistory =
-      incomingMessages
-        .filter(
-          m =>
-            m &&
-            (
-              m.role === "user" ||
-              m.role === "assistant"
-            ) &&
-            typeof m.content === "string"
-        )
-        .slice(-20);
-
+    const safeHistory =
+      Array.isArray(history)
+        ? history
+            .slice(-12)
+            .filter(
+              m =>
+                m &&
+                (m.role === "user" ||
+                 m.role === "assistant") &&
+                typeof m.content === "string"
+            )
+            .map(m => ({
+              role:m.role,
+              content:m.content
+            }))
+        : [];
 
     const messages = [
+
       {
         role:"system",
-        content:systemPrompt
+        content:SYSTEM_PROMPT
       },
-      ...cleanedHistory
-    ];
 
+      ...safeHistory,
 
-    /*
-      Safety against malformed client history:
-      always make sure the latest message exists.
-    */
-
-    if(
-      !messages.some(
-        m =>
-          m.role === "user" &&
-          m.content === message
-      )
-    ){
-
-      messages.push({
+      {
         role:"user",
         content:message
-      });
+      }
 
-    }
-
-
-    /* =====================================================
-       LITEROUTER
-    ===================================================== */
+    ];
 
     const response =
       await fetch(
@@ -201,11 +129,9 @@ You are ARES AI. Be technically useful, accurate, and practical.
 
             messages,
 
-            temperature:
-              0.65,
+            temperature:0.6,
 
-            max_tokens:
-              2048
+            max_tokens:2048
 
           })
         }
@@ -217,14 +143,14 @@ You are ARES AI. Be technically useful, accurate, and practical.
 
     let data = {};
 
-    try {
+    try{
 
       data =
         raw
           ? JSON.parse(raw)
           : {};
 
-    } catch {
+    }catch{
 
       data = {};
 
@@ -234,40 +160,31 @@ You are ARES AI. Be technically useful, accurate, and practical.
     if(!response.ok){
 
       console.error(
-        "LiteRouter HTTP error:",
+        "LiteRouter error:",
         response.status,
         raw
       );
 
-      return res.status(
-        response.status
-      ).json({
+      return res
+        .status(response.status)
+        .json({
 
-        error:
-          data?.error?.message ||
-          data?.error?.code ||
-          raw ||
-          `LiteRouter HTTP ${response.status}`
+          error:
+            data?.error?.message ||
+            data?.error?.code ||
+            raw ||
+            `LiteRouter HTTP ${response.status}`
 
-      });
+        });
 
     }
 
 
     const reply =
-      data
-        ?.choices
-        ?.[0]
-        ?.message
-        ?.content;
+      data?.choices?.[0]?.message?.content;
 
 
     if(!reply){
-
-      console.error(
-        "LiteRouter empty response:",
-        raw
-      );
 
       return res.status(502).json({
         error:
@@ -282,7 +199,7 @@ You are ARES AI. Be technically useful, accurate, and practical.
     });
 
 
-  } catch(error){
+  }catch(error){
 
     console.error(
       "ARES backend error:",
@@ -290,9 +207,11 @@ You are ARES AI. Be technically useful, accurate, and practical.
     );
 
     return res.status(500).json({
+
       error:
         error?.message ||
         "Backend request failed."
+
     });
 
   }
