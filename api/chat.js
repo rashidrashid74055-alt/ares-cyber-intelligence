@@ -1,20 +1,34 @@
 export default async function handler(req, res) {
+  // CORS headers
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+
+  // Browser CORS preflight
+  if (req.method === "OPTIONS") {
+    return res.status(204).end();
+  }
+
   if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method not allowed" });
+    return res.status(405).json({
+      error: "Method not allowed"
+    });
   }
 
   try {
     const { message } = req.body || {};
 
     if (!message || typeof message !== "string") {
-      return res.status(400).json({ error: "Message is required" });
+      return res.status(400).json({
+        error: "Message is required"
+      });
     }
 
     const apiKey = process.env.LITEROUTER_API_KEY;
 
     if (!apiKey) {
       return res.status(500).json({
-        error: "LITEROUTER_API_KEY is missing in Vercel."
+        error: "LITEROUTER_API_KEY is missing"
       });
     }
 
@@ -32,7 +46,7 @@ export default async function handler(req, res) {
             {
               role: "system",
               content:
-                "You are ARES AI, a helpful general-purpose AI assistant. Give clear, useful answers. For cybersecurity, focus on authorized testing, defensive security, education, Linux, networking, and safe labs."
+                "You are ARES AI, a helpful general-purpose AI assistant. Give clear and useful answers. For cybersecurity, focus on authorized testing, defensive security, education, Linux, networking and safe labs."
             },
             {
               role: "user",
@@ -54,27 +68,29 @@ export default async function handler(req, res) {
         error:
           data?.error?.message ||
           data?.message ||
-          "LiteRouter request failed."
+          "LiteRouter request failed"
       });
     }
 
     const reply = data?.choices?.[0]?.message?.content;
 
     if (!reply) {
-      console.error("Unexpected LiteRouter response:", data);
+      console.error("Unexpected response:", data);
 
       return res.status(502).json({
-        error: "LiteRouter returned no text response."
+        error: "LiteRouter returned no text"
       });
     }
 
-    return res.status(200).json({ reply });
+    return res.status(200).json({
+      reply
+    });
 
   } catch (error) {
-    console.error("ARES backend error:", error);
+    console.error("Backend error:", error);
 
     return res.status(500).json({
-      error: "ARES backend temporarily unavailable."
+      error: error?.message || "Backend request failed"
     });
   }
 }
