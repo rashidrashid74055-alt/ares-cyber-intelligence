@@ -1,10 +1,10 @@
 export default async function handler(req, res) {
-  // CORS headers
+
+  // CORS
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
-  // Browser CORS preflight
   if (req.method === "OPTIONS") {
     return res.status(204).end();
   }
@@ -16,6 +16,7 @@ export default async function handler(req, res) {
   }
 
   try {
+
     const { message } = req.body || {};
 
     if (!message || typeof message !== "string") {
@@ -24,11 +25,12 @@ export default async function handler(req, res) {
       });
     }
 
-    const apiKey = process.env.LITEROUTER_API_KEY;
+    const apiKey =
+      process.env.LITEROUTER_API_KEY;
 
     if (!apiKey) {
       return res.status(500).json({
-        error: "LITEROUTER_API_KEY is missing"
+        error: "LITEROUTER_API_KEY is missing in Vercel."
       });
     }
 
@@ -36,61 +38,92 @@ export default async function handler(req, res) {
       "https://api.literouter.com/v1/chat/completions",
       {
         method: "POST",
+
         headers: {
           "Authorization": `Bearer ${apiKey}`,
           "Content-Type": "application/json"
         },
+
         body: JSON.stringify({
-          model: "deepseek-v4-flash-0731:free",
+
+          // Current documented free LiteRouter model
+          model: "glm-5.3-flash:free",
+
           messages: [
             {
               role: "system",
               content:
-                "You are ARES AI, a helpful general-purpose AI assistant. Give clear and useful answers. For cybersecurity, focus on authorized testing, defensive security, education, Linux, networking and safe labs."
+                "You are ARES AI, a helpful general-purpose AI assistant. Give clear and useful answers. For cybersecurity, focus on authorized testing, defensive security, education, Linux, networking, troubleshooting and safe labs."
             },
             {
               role: "user",
               content: message
             }
           ],
+
           temperature: 0.7,
           max_tokens: 2048
         })
       }
     );
 
-    const data = await response.json();
+    const raw = await response.text();
+
+    let data = {};
+
+    try {
+      data = raw ? JSON.parse(raw) : {};
+    } catch {
+      data = {};
+    }
 
     if (!response.ok) {
-      console.error("LiteRouter error:", data);
+
+      console.error(
+        "LiteRouter HTTP error:",
+        response.status,
+        raw
+      );
 
       return res.status(response.status).json({
         error:
           data?.error?.message ||
-          data?.message ||
-          "LiteRouter request failed"
+          data?.error?.code ||
+          raw ||
+          `LiteRouter HTTP ${response.status}`
       });
     }
 
-    const reply = data?.choices?.[0]?.message?.content;
+    const reply =
+      data?.choices?.[0]?.message?.content;
 
     if (!reply) {
-      console.error("Unexpected response:", data);
+
+      console.error(
+        "LiteRouter empty response:",
+        raw
+      );
 
       return res.status(502).json({
-        error: "LiteRouter returned no text"
+        error: "LiteRouter returned no AI response."
       });
     }
 
     return res.status(200).json({
-      reply
+      reply: reply
     });
 
   } catch (error) {
-    console.error("Backend error:", error);
+
+    console.error(
+      "ARES backend error:",
+      error
+    );
 
     return res.status(500).json({
-      error: error?.message || "Backend request failed"
+      error:
+        error?.message ||
+        "Backend request failed."
     });
   }
 }
