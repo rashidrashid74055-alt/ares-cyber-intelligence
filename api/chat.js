@@ -1,219 +1,161 @@
+
 export default async function handler(req, res) {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  res.setHeader("Access-Control-Max-Age", "86400");
+  res.setHeader("Cache-Control", "no-store");
 
-  res.setHeader(
-    "Access-Control-Allow-Origin",
-    "*"
-  );
-
-  res.setHeader(
-    "Access-Control-Allow-Methods",
-    "POST, OPTIONS"
-  );
-
-  res.setHeader(
-    "Access-Control-Allow-Headers",
-    "Content-Type"
-  );
-
-  if(req.method === "OPTIONS"){
+  if (req.method === "OPTIONS") {
     return res.status(204).end();
   }
 
-  if(req.method !== "POST"){
+  if (req.method !== "POST") {
     return res.status(405).json({
-      error:"Method not allowed"
+      error: "Method not allowed. Use POST."
     });
   }
 
-  try{
+  const apiKey = process.env.LITEROUTER_API_KEY;
 
-    const {
-      message,
-      history = []
-    } = req.body || {};
+  if (!apiKey) {
+    return res.status(500).json({
+      error: "LITEROUTER_API_KEY is missing in Vercel."
+    });
+  }
 
-    if(
-      !message ||
-      typeof message !== "string"
-    ){
+  try {
+    const body = req.body || {};
+    const message =
+      typeof body.message === "string"
+        ? body.message.trim()
+        : "";
 
+    if (!message) {
       return res.status(400).json({
-        error:"Message is required"
+        error: "Message is required."
       });
-
     }
 
-    const apiKey =
-      process.env.LITEROUTER_API_KEY;
-
-    if(!apiKey){
-
-      return res.status(500).json({
-        error:
-          "LITEROUTER_API_KEY is missing in Vercel."
+    if (message.length > 12000) {
+      return res.status(413).json({
+        error: "Message is too long."
       });
-
     }
 
-    const SYSTEM_PROMPT = `
-You are ARES AI, an advanced general-purpose AI assistant with a strong cybersecurity, Linux, networking, programming and troubleshooting focus.
+    const SYSTEM_PROMPT = `You are ARES AI, a practical general-purpose AI assistant focused on cybersecurity education, Linux, Termux, Android, networking, programming, web development, GitHub, Vercel, troubleshooting, CTFs and defensive security.
 
-You should be knowledgeable about cybersecurity concepts, Linux, networking, web security, vulnerability research, security tools, malware analysis, RAT analysis, DDoS concepts, reverse engineering, incident response, digital forensics, CTFs and authorized penetration-testing labs.
+Answer directly and concisely. Give clear steps and copyable code when useful. Match the user's language. Never claim to have performed actions you did not perform.
 
-For cybersecurity hands-on requests, assume the user is working only on systems they own or an explicitly authorized lab, CTF or isolated test environment.
+Support defensive security, authorized testing, CTFs and harmless lab simulations. Do not help with unauthorized access, credential theft, real-world DDoS, harmful malware deployment, stealth, persistence or evasion. Offer safe defensive alternatives.
 
-You may teach defensive analysis, detection, safe simulations, lab setup, benign proof-of-concepts and authorized security testing.
+Do not invent commands, facts or capabilities.`;
 
-Do NOT provide instructions that enable unauthorized access, credential theft, real-world DDoS attacks, deployment of weaponized malware/RATs against victims, persistence, stealth/evasion, bypassing security controls, or harming real systems.
+    const history = Array.isArray(body.history)
+      ? body.history
+          .slice(-6)
+          .filter(
+            (m) =>
+              m &&
+              ["user", "assistant"].includes(m.role) &&
+              typeof m.content === "string" &&
+              m.content.trim()
+          )
+          .map((m) => ({
+            role: m.role,
+            content: m.content.slice(0, 4000)
+          }))
+      : [];
 
-When a request crosses that boundary, redirect it toward an isolated Kali Linux lab, CTF, intentionally vulnerable VM, harmless simulation, detection or defensive analysis.
+    const controller = new AbortController();
+    const timeout = setTimeout(
+      () => controller.abort(),
+      25000
+    );
 
-Always be practical and clear. When giving commands, explain what they do and keep them appropriate for an authorized environment.
+    let response;
+    let raw;
 
-Do not pretend to know a tool or command if you are uncertain. Say so and provide the safest accurate alternative.
-
-You are ARES AI. Answer the user's actual question directly.
-`;
-
-    const safeHistory =
-      Array.isArray(history)
-        ? history
-            .slice(-12)
-            .filter(
-              m =>
-                m &&
-                (m.role === "user" ||
-                 m.role === "assistant") &&
-                typeof m.content === "string"
-            )
-            .map(m => ({
-              role:m.role,
-              content:m.content
-            }))
-        : [];
-
-    const messages = [
-
-      {
-        role:"system",
-        content:SYSTEM_PROMPT
-      },
-
-      ...safeHistory,
-
-      {
-        role:"user",
-        content:message
-      }
-
-    ];
-
-    const response =
-      await fetch(
+    try {
+      response = await fetch(
         "https://api.literouter.com/v1/chat/completions",
         {
-          method:"POST",
-
-          headers:{
-            "Authorization":
-              `Bearer ${apiKey}`,
-
-            "Content-Type":
-              "application/json"
+          method: "POST",
+          signal: controller.signal,
+          headers: {
+            Authorization: `Bearer ${apiKey}`,
+            "Content-Type": "application/json"
           },
-
-          body:JSON.stringify({
-
-            model:
-              "glm-5.3-flash:free",
-
-            messages,
-
-            temperature:0.6,
-
-            max_tokens:2048
-
+          body: JSON.stringify({
+            model: "glm-5.3-flash:free",
+            messages: [
+              {
+                role: "system",
+                content: SYSTEM_PROMPT
+              },
+              ...history,
+              {
+                role: "user",
+                content: message
+              }
+            ],
+            temperature: 0.5,
+            max_tokens: 900,
+            stream: false
           })
         }
       );
 
-
-    const raw =
-      await response.text();
+      raw = await response.text();
+    } finally {
+      clearTimeout(timeout);
+    }
 
     let data = {};
 
-    try{
-
-      data =
-        raw
-          ? JSON.parse(raw)
-          : {};
-
-    }catch{
-
+    try {
+      data = raw ? JSON.parse(raw) : {};
+    } catch {
       data = {};
-
     }
 
-
-    if(!response.ok){
-
+    if (!response.ok) {
       console.error(
         "LiteRouter error:",
         response.status,
-        raw
+        raw.slice(0, 1000)
       );
 
-      return res
-        .status(response.status)
-        .json({
-
-          error:
-            data?.error?.message ||
-            data?.error?.code ||
-            raw ||
-            `LiteRouter HTTP ${response.status}`
-
-        });
-
+      return res.status(502).json({
+        error:
+          data?.error?.message ||
+          `AI provider returned HTTP ${response.status}.`
+      });
     }
-
 
     const reply =
       data?.choices?.[0]?.message?.content;
 
-
-    if(!reply){
-
+    if (typeof reply !== "string" || !reply.trim()) {
       return res.status(502).json({
-        error:
-          "LiteRouter returned no AI response."
+        error: "AI provider returned an empty reply. Try again."
       });
-
     }
 
-
     return res.status(200).json({
-      reply
+      reply: reply.trim()
     });
+  } catch (error) {
+    if (error?.name === "AbortError") {
+      return res.status(504).json({
+        error: "AI response timed out. Please try again."
+      });
+    }
 
-
-  }catch(error){
-
-    console.error(
-      "ARES backend error:",
-      error
-    );
+    console.error("ARES backend error:", error);
 
     return res.status(500).json({
-
-      error:
-        error?.message ||
-        "Backend request failed."
-
+      error: "ARES backend failed. Please try again."
     });
-
   }
-
 }
